@@ -1,0 +1,334 @@
+mysql> show databases;
++----------------------+
+| Database             |
++----------------------+
+| addressbookservicedb |
+| information_schema   |
+| mysql                |
+| payroll_service      |
+| performance_schema   |
+| sakila               |
+| spotify              |
+| sys                  |
+| world                |
++----------------------+
+9 rows in set (0.05 sec)
+
+mysql> CREATE database Joint_sql
+    -> ;
+Query OK, 1 row affected (0.41 sec)
+
+mysql> show databases;
++----------------------+
+| Database             |
++----------------------+
+| addressbookservicedb |
+| information_schema   |
+| joint_sql            |
+| mysql                |
+| payroll_service      |
+| performance_schema   |
+| sakila               |
+| spotify              |
+| sys                  |
+| world                |
++----------------------+
+10 rows in set (0.00 sec)
+
+mysql> use Joint_sql;
+Database changed
+mysql> CREATE TABLE employee(
+    -> emp_id int auto_increment primary key,
+    -> name varchar(40),
+    -> city varchar(40)
+    -> );
+Query OK, 0 rows affected (2.90 sec)
+
+mysql> INSERT INTO employee(name,city)
+    -> VALUES ('RAHUL','DELHI'),
+    -> ('JAY' , 'MUM'),
+    -> ('KRISH','KOL');
+Query OK, 2 rows affected (0.22 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select * from employee;
++--------+-------+-------+
+| emp_id | name  | city  |
++--------+-------+-------+
+|      1 | RAHUL | DELHI |
+|      2 | JAY   | MUM   |
+|      3 | KRISH | KOL   |
++--------+-------+-------+
+3 rows in set (0.00 sec)
+
+mysql> CREATE TABLE department(
+    -> dept_id int primary key,
+    -> depName varchar(40)
+    -> );
+Query OK, 0 rows affected (2.08 sec)
+
+
+mysql> INSERT INTO department(dept_id,depName)
+    -> VALUES(101,'IT'),
+    -> (102,'HR'),
+    -> (103,'Admin');
+Query OK, 3 rows affected (0.46 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> select * from department;
++---------+---------+
+| dept_id | depName |
++---------+---------+
+|     101 | IT      |
+|     102 | HR      |
+|     103 | Admin   |
++---------+---------+
+3 rows in set (0.00 sec)
+
+=======================================================CROSS JOIN=================================================================
+
+mysql> SELECT name, depName from employee CROSS JOIN department;
++-------+---------+
+| name  | depName |
++-------+---------+
+| KRISH | IT      |
+| JAY   | IT      |
+| RAHUL | IT      |
+| KRISH | HR      |
+| JAY   | HR      |
+| RAHUL | HR      |
+| KRISH | Admin   |
+| JAY   | Admin   |
+| RAHUL | Admin   |
++-------+---------+
+9 rows in set (0.30 sec)
+
+mysql> SELECT name, depName from department CROSS JOIN employee;
++-------+---------+
+| name  | depName |
++-------+---------+
+| RAHUL | Admin   |
+| RAHUL | HR      |
+| RAHUL | IT      |
+| JAY   | Admin   |
+| JAY   | HR      |
+| JAY   | IT      |
+| KRISH | Admin   |
+| KRISH | HR      |
+| KRISH | IT      |
++-------+---------+
+9 rows in set (0.00 sec)
+
+
+
+==================================================INNER JOIN==================================================================
+
+
+
+mysql> CREATE TABLE emp(
+    -> empid int auto_increment primary key,
+    -> name varchar(40),
+    -> city varchar(40)
+    -> );
+Query OK, 0 rows affected (1.81 sec)
+
+
+mysql> INSERT INTO emp(name, city)
+    -> VALUES ('RAHUL', 'DELHI'),
+    -> ('KRISH', 'KOL'),
+    -> ('JAY', 'MUM');
+Query OK, 3 rows affected (0.16 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+
+mysql> CREATE TABLE dep(
+    -> did int primary key,
+    -> depname varchar(40),
+    -> empid int,
+    -> CONSTRAINT employee_id_fk
+    -> FOREIGN KEY(empid)REFERENCES emp(empid)
+    -> );
+Query OK, 0 rows affected (4.49 sec)
+
+mysql> INSERT INTO dep(did, depname, empid)
+    -> VALUES (101,'IT',3),
+    -> (102,'HR',2),
+    -> (103,'Admin',1);
+Query OK, 3 rows affected (0.56 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+
+mysql> select * from emp;
++-------+-------+-------+
+| empid | name  | city  |
++-------+-------+-------+
+|     1 | RAHUL | DELHI |
+|     2 | KRISH | KOL   |
+|     3 | JAY   | MUM   |
++-------+-------+-------+
+3 rows in set (0.12 sec)
+
+mysql> select * from dep;
++-----+---------+-------+
+| did | depname | empid |
++-----+---------+-------+
+| 101 | IT      |     3 |
+| 102 | HR      |     2 |
+| 103 | Admin   |     1 |
++-----+---------+-------+
+3 rows in set (0.04 sec)
+
+------------------------------------------------------EQUIJOIN------------------------------------------------------------------
+mysql> SELECT emp.name, dep.depname FROM emp
+    -> INNER JOIN dep
+    -> ON emp.empid=dep.empid;
++-------+---------+
+| name  | depname |
++-------+---------+
+| RAHUL | Admin   |
+| KRISH | HR      |
+| JAY   | IT      |
++-------+---------+
+3 rows in set (0.01 sec)
+
+
+mysql> SELECT emp.name, dep.depname FROM dep
+    -> INNER JOIN emp
+    -> ON emp.empid = dep.empid;
++-------+---------+
+| name  | depname |
++-------+---------+
+| JAY   | IT      |
+| KRISH | HR      |
+| RAHUL | Admin   |
++-------+---------+
+3 rows in set (0.00 sec)
+
+-----------------------------------------------------NON-EQUIJOIN " <> "----------------------------------------------------------
+
+
+mysql> SELECT emp.name, dep.depname FROM dep
+    -> INNER JOIN emp
+    -> ON emp.empid <> dep.empid;
++-------+---------+
+| name  | depname |
++-------+---------+
+| RAHUL | HR      |
+| RAHUL | IT      |
+| KRISH | Admin   |
+| KRISH | IT      |
+| JAY   | Admin   |
+| JAY   | HR      |
++-------+---------+
+6 rows in set (0.00 sec)
+
+------------------------------------------------------NATURAL JOIN----------------------------------------------------------------
+mysql> SELECT emp.name, dep.depname FROM dep
+    -> NATURAL JOIN emp;
++-------+---------+
+| name  | depname |
++-------+---------+
+| JAY   | IT      |
+| KRISH | HR      |
+| RAHUL | Admin   |
++-------+---------+
+3 rows in set (0.00 sec)
+
+
+
+=====================================================OUTER JOIN====================================================================
+
+mysql> CREATE TABLE emp(
+    -> empid int auto_increment primary key,
+    -> name varchar(40),
+    -> city varchar(40)
+    -> );
+Query OK, 0 rows affected (1.81 sec)
+
+
+mysql> INSERT INTO emp(name, city)
+    -> VALUES ('RAHUL', 'DELHI'),
+    -> ('KRISH', 'KOL'),
+    -> ('JAY', 'MUM'),
+    -> ('sonam', 'Hyd'),
+    -> ('Mona', 'patna');
+Query OK, 5 rows affected (0.16 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+
+mysql> CREATE TABLE dep(
+    -> did int primary key,
+    -> depname varchar(40),
+    -> empid int,
+    -> CONSTRAINT employee_id_fk
+    -> FOREIGN KEY(empid)REFERENCES emp(empid)
+    -> );
+Query OK, 0 rows affected (4.49 sec)
+
+mysql> INSERT INTO dep(did, depname, empid)
+    -> VALUES (101,'IT',3),
+    -> (102,'HR',2),
+    -> (103,'Admin',1);
+Query OK, 3 rows affected (0.56 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+-------------------------------------------------------Left Join------------------------------------------------------------------
+
+mysql> SELECT emp.name, dep.depname FROM emp
+    -> LEFT JOIN dep
+    -> ON emp.empid = dep.empid;
++-------+---------+
+| name  | depname |
++-------+---------+
+| RAHUL | Admin   |
+| KRISH | HR      |
+| JAY   | IT      |
+| sonam | NULL    |
+| Mona  | NULL    |
++-------+---------+
+5 rows in set (0.00 sec)
+
+
+mysql> SELECT emp.name, dep.depname FROM dep
+    -> LEFT JOIN emp
+    -> ON emp.empid = dep.empid;
++-------+---------+
+| name  | depname |
++-------+---------+
+| JAY   | IT      |
+| KRISH | HR      |
+| RAHUL | Admin   |
++-------+---------+
+3 rows in set (0.00 sec)
+
+
+------------------------------------------------------------RIGHT JOIN------------------------------------------------------------
+
+
+mysql> SELECT emp.name, dep.depname FROM emp
+    -> RIGHT JOIN dep
+    -> ON emp.empid = dep.empid;
++-------+---------+
+| name  | depname |
++-------+---------+
+| JAY   | IT      |
+| KRISH | HR      |
+| RAHUL | Admin   |
++-------+---------+
+3 rows in set (0.00 sec)
+
+
+mysql> SELECT emp.name, dep.depname FROM dep
+    -> RIGHT JOIN emp
+    -> ON emp.empid = dep.empid;
++-------+---------+
+| name  | depname |
++-------+---------+
+| RAHUL | Admin   |
+| KRISH | HR      |
+| JAY   | IT      |
+| sonam | NULL    |
+| Mona  | NULL    |
++-------+---------+
+5 rows in set (0.00 sec)
+
